@@ -1,89 +1,126 @@
-'use client';
- 
+'use client'
+
+import { Search, Star } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-export default function Home() {
-  const [platform, setPlatform] = useState<string>('web');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.electronAPI) {
-      setPlatform(window.electronAPI.platform);
+export default function AssignmentMarketplace() {
+  const { data, status } = useSession();
+  
+    const router = useRouter()
+    if (data?.user && status === 'authenticated') {
+      router.push('/profile');
     }
-  }, []);
 
-  const stack = [
-    { name: 'Electron', version: '40+', color: 'from-sky-400 to-blue-600' },
-    { name: 'Next.js', version: '16', color: 'from-zinc-400 to-zinc-700' },
-    { name: 'Tailwind', version: '4', color: 'from-cyan-400 to-teal-600' },
-    { name: 'TypeScript', version: '5', color: 'from-blue-400 to-indigo-600' },
+  const writers = [
+    {
+      id: 1,
+      name: "Sarah Mitchell",
+      rating: 4.9,
+      completed: 156,
+      rate: 5,
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"
+    },
+    {
+      id: 2,
+      name: "James Rodriguez",
+      rating: 4.8,
+      completed: 203,
+      rate: 10,
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
+    },
+    {
+      id: 3,
+      name: "Emily Chen",
+      rating: 5.0,
+      completed: 89,
+      rate: 22,
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop"
+    }
   ];
 
-  const router = useRouter()
-
   return (
-    <main className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center px-6 py-20">
-      {/* Glow background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-600 opacity-20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500 opacity-20 rounded-full blur-3xl" />
-      </div>
-
-      <Link href="/dashboard">Dashboard</Link>
-
-      <div className="relative z-10 flex flex-col items-center gap-10 max-w-2xl w-full">
-        {/* Header */}
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 text-sm text-zinc-300 mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Running on <span className="text-white font-semibold ml-1">{platform}</span>
-          </div>
-          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-br from-white to-zinc-400 bg-clip-text text-transparent leading-tight">
-            Electron + Next.js
-          </h1>
-          <p className="mt-3 text-zinc-400 text-lg">
-            Your boilerplate is ready. Start building something amazing.
-          </p>
+    <div className="min-h-screen  ">
+      {/* Hero Section */}
+      <div className="relative overflow-  bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?q=80&w=2146&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center"></div>
         </div>
 
-        {/* Stack badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
-          {stack.map((item) => (
-            <div
-              key={item.name}
-              className="flex flex-col items-center gap-2 bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors cursor-default"
-            >
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} shadow-lg`} />
-              <span className="font-semibold text-white text-sm">{item.name}</span>
-              <span className="text-xs text-zinc-500">v{item.version}</span>
+        <div className="relative max-w-7xl mx-auto px-6 py-20">
+          <div className="text-center mb-12">
+            <div className="center gap-3 max-md:gap-0">
+              <p className='text-6xl max-md:text-4xl font-extrabold mb-4 bg-gradient-to-r from-[#a860e3] to-[#5A189A] bg-clip-text text-transparent'>       Write For Me</p>
+              <img src="/logo.png" className="animate-logo duration-700 hover:scale-[1.3] transition-all w-28 h-28 " alt="" />
             </div>
-          ))}
-        </div>
-
-        {/* Quick start guide */}
-        <div className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800">
-            <span className="w-3 h-3 rounded-full bg-red-500" />
-            <span className="w-3 h-3 rounded-full bg-yellow-500" />
-            <span className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="text-xs text-zinc-500 ml-2 font-mono">terminal</span>
+            <p className="text-xl max-md:text-lg text-zinc-400">Connect writers with those who need quality work</p>
           </div>
-          <div className="p-5 font-mono text-sm space-y-2">
-            <div className="text-zinc-500"># Start dev (Next.js + Electron)</div>
-            <div><span className="text-emerald-400">$</span> <span className="text-white">npm run dev</span></div>
-            <div className="mt-4 text-zinc-500"># Build production app</div>
-            <div><span className="text-emerald-400">$</span> <span className="text-white">npm run build</span></div>
-            <div className="mt-4 text-zinc-500"># Package distributable</div>
-            <div><span className="text-emerald-400">$</span> <span className="text-white">npm run dist</span></div>
-          </div>
-        </div>
 
-        <p className="text-zinc-600 text-sm text-center">
-          Edit <code className="text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">src/app/page.tsx</code> to get started.
-          Main process lives in <code className="text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">electron/main.ts</code>.
-        </p>
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search by writer, college name , or district..."
+                className="w-full !border-none bg-zinc-900/20 backdrop-blur-[20px]  rounded-2xl pl-12 max-md:pl-5 pr-4 py-4 text-zinc-100 placeholder-zinc-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div className=' w-full center'>
+            <Link href="/sign-in" className="duration-500 hover:scale-[1.1] transition-all items-center gap-2 buttonbg text-white py-3 px-6 rounded-xl font-medium ">
+             Find Writer
+            </Link>
+          </div>
+
+        </div>
       </div>
-    </main>
+
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold">Available Writers Nearby You</h2>
+            <p className="text-zinc-400">{writers.length} writers online</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {writers.map((writer) => (
+              <div
+                key={writer.id}
+                className="card backdrop-blur border border-zinc-800 rounded-2xl p-6 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/10"
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <img
+                    src={writer.avatar}
+                    alt={writer.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg">{writer.name}</h3>
+                    <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                      <Star size={16} fill="currentColor" />
+                      <span>{writer.rating}</span>
+                      <span className="text-zinc-500">({writer.completed} completed)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-4">
+                  <span>₹ {writer.rate} / page</span>
+                </div>
+
+                <button className="w-full buttonbg hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition-colors">
+                  Hire Writer
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

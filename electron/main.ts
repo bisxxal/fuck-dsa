@@ -18,7 +18,7 @@ function createWindow(): void {
             contextIsolation: true,
             sandbox: false,
         },
-        titleBarStyle: 'hiddenInset',
+        frame: false,
         show: false,
         backgroundColor: '#0a0a0a',
     });
