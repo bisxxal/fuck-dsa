@@ -46,7 +46,7 @@ export interface IShortcutsHelperDeps {
   getMainWindow: () => BrowserWindow | null
   takeScreenshot: () => Promise<string>
   getImagePreview: (filepath: string) => Promise<string>
-  //   processingHelper: ProcessingHelper | null
+    // processingHelper: ProcessingHelper | null
   processingHelper: any | null
   clearQueues: () => void
   setView: (view: "queue" | "solutions" | "debug") => void
@@ -58,7 +58,7 @@ export interface IShortcutsHelperDeps {
   moveWindowDown: () => void
 }
 export interface IProcessingHelperDeps {
-    getScreenshotHelper: () => ScreenshotHelper | null
+  getScreenshotHelper: () => ScreenshotHelper | null
   getMainWindow: () => BrowserWindow | null
   getView: () => "queue" | "solutions" | "debug"
   setView: (view: "queue" | "solutions" | "debug") => void

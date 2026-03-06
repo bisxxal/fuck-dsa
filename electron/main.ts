@@ -6,6 +6,7 @@ import * as dotenv from "dotenv"
 import { configHelper } from './configHelper';
 import { initializeIpcHandlers } from './ipcHandlers';
 import { getMainWindow, getScreenshotQueue, setWindowDimensions, moveWindowHorizontal, moveWindowVertical, getExtraScreenshotQueue, deleteScreenshot, getImagePreview, takeScreenshot, getView, toggleMainWindow, clearQueues, setView, setHasDebugged, getHasDebugged } from './windowFun';
+import { initAutoUpdater } from './autoUpdater';
 
 const isDev = process.env.NODE_ENV === 'development';
 const NEXT_DEV_URL = 'http://localhost:3000';
@@ -240,13 +241,8 @@ async function initializeApp() {
     state.shortcutsHelper?.registerGlobalShortcuts()
 
     // Initialize auto-updater regardless of environment
-    
-    // initAutoUpdater()
-    // console.log(
-    //   "Auto-updater initialized in",
-    //   isDev ? "development" : "production",
-    //   "mode"
-    // )
+    initAutoUpdater()
+    console.log("Auto-updater initialized in",isDev ? "development" : "production","mode")
 
   } catch (error) {
     console.error("Failed to initialize application:", error)
@@ -254,6 +250,37 @@ async function initializeApp() {
   }
 
 }
+
+// Handle second instance (removed auth callback handling)
+app.on("second-instance", (event, commandLine) => {
+  console.log("second-instance event received:", commandLine)
+  
+  // Focus or create the main window
+  if (!state.mainWindow) {
+    createWindow()
+  } else {
+    if (state.mainWindow.isMinimized()) state.mainWindow.restore()
+    state.mainWindow.focus()
+  }
+})
+
+// Prevent multiple instances of the app
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+} else {
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+      app.quit()
+      state.mainWindow = null
+    }
+  })
+}
+// Handles when user re-opens your app on macOS
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow()
+  }
+})
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -272,19 +299,3 @@ app.on("activate", () => {
   }
 })
 app.whenReady().then(initializeApp)
-
-// app.whenReady().then(() => {
-//   createWindow();
-
-//   app.on('activate', () => {
-//     if (BrowserWindow.getAllWindows().length === 0) {
-//       createWindow();
-//     }
-//   });
-// });
-
-// app.on('window-all-closed', () => {
-//   if (process.platform !== 'darwin') {
-//     app.quit();
-//   }
-// });

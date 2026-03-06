@@ -124,7 +124,7 @@ export function setWindowDimensions(width: number, height: number): void {
 }
 
 
-// State getter/setter functions
+// State getter/setter functions (in main.ts)
 function getMainWindow(): BrowserWindow | null {
   return state.mainWindow
 }
