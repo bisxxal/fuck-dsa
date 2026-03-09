@@ -46,8 +46,7 @@ export interface IShortcutsHelperDeps {
   getMainWindow: () => BrowserWindow | null
   takeScreenshot: () => Promise<string>
   getImagePreview: (filepath: string) => Promise<string>
-    // processingHelper: ProcessingHelper | null
-  processingHelper: any | null
+  processingHelper: ProcessingHelper | null 
   clearQueues: () => void
   setView: (view: "queue" | "solutions" | "debug") => void
   isVisible: () => boolean
@@ -86,8 +85,7 @@ export interface IIpcHandlerDeps {
     path: string
   ) => Promise<{ success: boolean; error?: string }>
   getImagePreview: (filepath: string) => Promise<string>
-  //   processingHelper: ProcessingHelper | null
-  processingHelper: any | null
+  processingHelper: ProcessingHelper | null
   PROCESSING_EVENTS: typeof state.PROCESSING_EVENTS
   takeScreenshot: () => Promise<string>
   getView: () => "queue" | "solutions" | "debug"
@@ -159,7 +157,73 @@ export interface IIpcHandlerDeps {
 }
 
 // Initialize helpers
-export function initializeHelpers() {
+export interface IInitHelpersDeps {
+  getScreenshotHelper: () => ScreenshotHelper | null
+  getMainWindow: () => any
+  getView: () => "queue" | "solutions" | "debug"
+  setView: (view: "queue" | "solutions" | "debug") => void
+  getProblemInfo: () => any
+  setProblemInfo: (info: any) => void
+  getScreenshotQueue: () => string[]
+  getExtraScreenshotQueue: () => string[]
+  clearQueues: () => void
+  takeScreenshot: () => Promise<string>
+  getImagePreview: (filepath: string) => Promise<string>
+  deleteScreenshot: (path: string) => Promise<{ success: boolean; error?: string }>
+  setHasDebugged: (value: boolean) => void
+  getHasDebugged: () => boolean
+  toggleMainWindow: () => void
+  moveWindowHorizontal: (transform: (x: number) => number) => void
+  moveWindowVertical: (transform: (y: number) => number) => void
+}
+
+// export function initializeHelpers(deps: IInitHelpersDeps) {
+//   state.screenshotHelper = new ScreenshotHelper(state.view)
+//   state.processingHelper = new ProcessingHelper({
+//     getScreenshotHelper: deps.getScreenshotHelper,
+//     getMainWindow: deps.getMainWindow,
+//     getView: deps.getView,
+//     setView: deps.setView,
+//     getProblemInfo: deps.getProblemInfo,
+//     setProblemInfo: deps.setProblemInfo,
+//     getScreenshotQueue: deps.getScreenshotQueue,
+//     getExtraScreenshotQueue: deps.getExtraScreenshotQueue,
+//     clearQueues: deps.clearQueues,
+//     takeScreenshot: deps.takeScreenshot,
+//     getImagePreview: deps.getImagePreview,
+//     deleteScreenshot: deps.deleteScreenshot,
+//     setHasDebugged: deps.setHasDebugged,
+//     getHasDebugged: deps.getHasDebugged,
+//     PROCESSING_EVENTS: state.PROCESSING_EVENTS
+//   } as IProcessingHelperDeps)
+
+//   state.shortcutsHelper = new ShortcutsHelper({
+//     getMainWindow: deps.getMainWindow,
+//     takeScreenshot: deps.takeScreenshot,
+//     getImagePreview: deps.getImagePreview,
+//     processingHelper: state.processingHelper,
+//     clearQueues: deps.clearQueues,
+//     setView: deps.setView,
+//     isVisible: () => state.isWindowVisible,
+//     toggleMainWindow: deps.toggleMainWindow,
+//     moveWindowLeft: () =>
+//       deps.moveWindowHorizontal((x) =>
+//         Math.max(-(state.windowSize?.width || 0) / 2, x - state.step)
+//       ),
+//     moveWindowRight: () =>
+//       deps.moveWindowHorizontal((x) =>
+//         Math.min(
+//           state.screenWidth - (state.windowSize?.width || 0) / 2,
+//           x + state.step
+//         )
+//       ),
+//     moveWindowUp: () => deps.moveWindowVertical((y) => y - state.step),
+//     moveWindowDown: () => deps.moveWindowVertical((y) => y + state.step)
+//   } as IShortcutsHelperDeps)
+// }
+
+// Initialize helpers
+export function initializeHelpers( ) {
   state.screenshotHelper = new ScreenshotHelper(state.view)
   state.processingHelper = new ProcessingHelper({
     getScreenshotHelper,
@@ -178,7 +242,6 @@ export function initializeHelpers() {
     getHasDebugged,
     PROCESSING_EVENTS: state.PROCESSING_EVENTS
   } as IProcessingHelperDeps)
-
   state.shortcutsHelper = new ShortcutsHelper({
     getMainWindow,
     takeScreenshot,
@@ -203,3 +266,23 @@ export function initializeHelpers() {
     moveWindowDown: () => moveWindowVertical((y) => y + state.step)
   } as IShortcutsHelperDeps)
 }
+
+export const PROCESSING_EVENTS = {
+
+  UNAUTHORIZED: "procesing-unauthorized",
+  NO_SCREENSHOTS: "processing-no-screenshots",
+  OUT_OF_CREDITS: "out-of-credits",
+  API_KEY_INVALID: "api-key-invalid",
+
+  //states for generating the initial solution
+  INITIAL_START: "initial-start",
+  PROBLEM_EXTRACTED: "problem-extracted",
+  SOLUTION_SUCCESS: "solution-success",
+  INITIAL_SOLUTION_ERROR: "solution-error",
+  RESET: "reset",
+
+  //states for processing the debugging
+  DEBUG_START: "debug-start",
+  DEBUG_SUCCESS: "debug-success",
+  DEBUG_ERROR: "debug-error"
+} as const

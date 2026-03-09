@@ -1,6 +1,8 @@
-import { BrowserWindow } from "electron"
-import { state } from "./constants"
+import { BrowserWindow, screen } from "electron"
+import { state, IProcessingHelperDeps, IShortcutsHelperDeps } from "./constants"
 import { ScreenshotHelper } from "./ScreenshotHelper"
+import { ProcessingHelper } from "./ProcessingHelper"
+import { ShortcutsHelper } from "./shotcuts"
 
 export function handleWindowMove(): void {
   if (!state.mainWindow) return
@@ -167,7 +169,7 @@ function clearQueues(): void {
 async function takeScreenshot(): Promise<string> {
   if (!state.mainWindow) throw new Error("No main window available")
   return (
-    state.screenshotHelper?.takeScreenshot(() => hideMainWindow(),() => showMainWindow()) || ""
+    state.screenshotHelper?.takeScreenshot(() => hideMainWindow(), () => showMainWindow()) || ""
   )
 }
 
@@ -191,12 +193,12 @@ function setHasDebugged(value: boolean): void {
 function getHasDebugged(): boolean {
   return state.hasDebugged
 }
- 
+
 
 
 // Export state and functions for other modules
 export {
-  state, 
+  state,
   getMainWindow,
   getView,
   setView,
@@ -211,4 +213,50 @@ export {
   deleteScreenshot,
   setHasDebugged,
   getHasDebugged
+}
+
+// Initialize helper classes — lives here because all deps are already in scope
+export function initializeHelpers() {
+  state.screenshotHelper = new ScreenshotHelper(state.view)
+  state.processingHelper = new ProcessingHelper({
+    getScreenshotHelper,
+    getMainWindow,
+    getView,
+    setView,
+    getProblemInfo,
+    setProblemInfo,
+    getScreenshotQueue,
+    getExtraScreenshotQueue,
+    clearQueues,
+    takeScreenshot,
+    getImagePreview,
+    deleteScreenshot,
+    setHasDebugged,
+    getHasDebugged,
+    PROCESSING_EVENTS: state.PROCESSING_EVENTS
+  } as IProcessingHelperDeps)
+
+  state.shortcutsHelper = new ShortcutsHelper({
+    getMainWindow,
+    takeScreenshot,
+    getImagePreview,
+    processingHelper: state.processingHelper,
+    clearQueues,
+    setView,
+    isVisible: () => state.isWindowVisible,
+    toggleMainWindow,
+    moveWindowLeft: () =>
+      moveWindowHorizontal((x) =>
+        Math.max(-(state.windowSize?.width || 0) / 2, x - state.step)
+      ),
+    moveWindowRight: () =>
+      moveWindowHorizontal((x) =>
+        Math.min(
+          state.screenWidth - (state.windowSize?.width || 0) / 2,
+          x + state.step
+        )
+      ),
+    moveWindowUp: () => moveWindowVertical((y) => y - state.step),
+    moveWindowDown: () => moveWindowVertical((y) => y + state.step)
+  } as IShortcutsHelperDeps)
 }

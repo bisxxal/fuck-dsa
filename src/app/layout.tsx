@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import QuaryClient from "@/provider/QuaryClient";
+import QuaryClient from "../provider/QuaryClient";
 
 export default function RootLayout({
   children,

@@ -14,6 +14,7 @@ interface Config {
     language: string;
     opacity: number;
 }
+
 class ConfigHelper extends EventEmitter {
     private configPath: string; // path to the config file
 
@@ -80,7 +81,6 @@ class ConfigHelper extends EventEmitter {
         try {
             if (fs.existsSync(this.configPath)) {
                 const config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
-
                 if (config.apiProvider !== "openai" && config.apiProvider !== "gemini" && config.apiProvider !== "anthropic") {
                     config.apiProvider = "gemini";
                 }

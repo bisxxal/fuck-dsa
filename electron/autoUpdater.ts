@@ -13,7 +13,7 @@ export function initAutoUpdater() {
 
   if (!process.env.GH_TOKEN) {
     console.error("GH_TOKEN environment variable is not set")
-    return
+    return;
   }
 
   // Configure auto updater
@@ -25,10 +25,7 @@ export function initAutoUpdater() {
   // Enable more verbose logging
   autoUpdater.logger = log
   log.transports.file.level = "debug"
-  console.log(
-    "Auto-updater logger configured with level:",
-    log.transports.file.level
-  )
+  console.log("Auto-updater logger configured with level:",log.transports.file.level)
 
   // Log all update events
   autoUpdater.on("checking-for-update", () => {

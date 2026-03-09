@@ -1,11 +1,12 @@
 import { IIpcHandlerDeps } from "./constants";
-import { ipcMain as ip, shell, dialog } from "electron"
+import { ipcMain as ip, shell  } from "electron"
 import { configHelper } from "./configHelper"
 
 export function initializeIpcHandlers(deps: IIpcHandlerDeps): void {
 
     //confuguration hander
     ip.handle("get-config", async () => {
+        console.log("calling ->>>>>>")
         return configHelper.loadConfig()
     })
 

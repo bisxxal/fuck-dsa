@@ -1,15 +1,14 @@
 import { app, BrowserWindow, screen, shell } from 'electron';
 import * as path from 'path';
 import fs from "fs"
-import { initializeHelpers, state } from './constants';
+import { state } from './constants';
 import * as dotenv from "dotenv"
 import { configHelper } from './configHelper';
 import { initializeIpcHandlers } from './ipcHandlers';
-import { getMainWindow, getScreenshotQueue, setWindowDimensions, moveWindowHorizontal, moveWindowVertical, getExtraScreenshotQueue, deleteScreenshot, getImagePreview, takeScreenshot, getView, toggleMainWindow, clearQueues, setView, setHasDebugged, getHasDebugged } from './windowFun';
+import { getMainWindow, getScreenshotQueue, setWindowDimensions, moveWindowHorizontal, moveWindowVertical, getExtraScreenshotQueue, deleteScreenshot, getImagePreview, takeScreenshot, getView, toggleMainWindow, clearQueues, setView, setHasDebugged, getHasDebugged, getScreenshotHelper, getProblemInfo, setProblemInfo, initializeHelpers } from './windowFun';
 import { initAutoUpdater } from './autoUpdater';
 
 const isDev = process.env.NODE_ENV === 'development';
-const NEXT_DEV_URL = 'http://localhost:3000';
 
 function createWindow() {
   if (state.mainWindow) {
@@ -148,21 +147,21 @@ function createWindow() {
 
   // Set opacity based on user preferences or hide initially
   // Ensure the window is visible for the first launch or if opacity > 0.1
-  // const savedOpacity = configHelper.getOpacity();
-  // console.log(`Initial opacity from config: ${savedOpacity}`);
+  const savedOpacity = configHelper.getOpacity();
+  console.log(`Initial opacity from config: ${savedOpacity}`);
 
-  // // Always make sure window is shown first
-  // state.mainWindow.showInactive(); // Use showInactive for consistency
+  // Always make sure window is shown first
+  state.mainWindow.showInactive(); // Use showInactive for consistency
 
-  // if (savedOpacity <= 0.1) {
-  //   console.log('Initial opacity too low, setting to 0 and hiding window');
-  //   state.mainWindow.setOpacity(0);
-  //   state.isWindowVisible = false;
-  // } else {
-  //   console.log(`Setting initial opacity to ${savedOpacity}`);
-  //   state.mainWindow.setOpacity(savedOpacity);
-  //   state.isWindowVisible = true;
-  // }
+  if (savedOpacity <= 0.1) {
+    console.log('Initial opacity too low, setting to 0 and hiding window');
+    state.mainWindow.setOpacity(0);
+    state.isWindowVisible = false;
+  } else {
+    console.log(`Setting initial opacity to ${savedOpacity}`);
+    state.mainWindow.setOpacity(savedOpacity);
+    state.isWindowVisible = true;
+  }
 }
 
 // Environment setup
@@ -207,7 +206,25 @@ async function initializeApp() {
     if (!configHelper.hasApiKey()) {
       console.log("No API key found in configuration. User will need to set up.")
     }
-    initializeHelpers();
+    initializeHelpers({
+      getScreenshotHelper,
+      getMainWindow,
+      getView,
+      setView,
+      getProblemInfo,
+      setProblemInfo,
+      getScreenshotQueue,
+      getExtraScreenshotQueue,
+      clearQueues,
+      takeScreenshot,
+      getImagePreview,
+      deleteScreenshot,
+      setHasDebugged,
+      getHasDebugged,
+      toggleMainWindow,
+      moveWindowHorizontal,
+      moveWindowVertical,
+    });
     initializeIpcHandlers({
       getMainWindow,
       setWindowDimensions,
@@ -242,7 +259,7 @@ async function initializeApp() {
 
     // Initialize auto-updater regardless of environment
     initAutoUpdater()
-    console.log("Auto-updater initialized in",isDev ? "development" : "production","mode")
+    console.log("Auto-updater initialized in", isDev ? "development" : "production", "mode")
 
   } catch (error) {
     console.error("Failed to initialize application:", error)
@@ -254,7 +271,7 @@ async function initializeApp() {
 // Handle second instance (removed auth callback handling)
 app.on("second-instance", (event, commandLine) => {
   console.log("second-instance event received:", commandLine)
-  
+
   // Focus or create the main window
   if (!state.mainWindow) {
     createWindow()
@@ -282,20 +299,5 @@ app.on("activate", () => {
   }
 })
 
-if (!app.requestSingleInstanceLock()) {
-  app.quit()
-} else {
-  app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-      app.quit()
-      state.mainWindow = null
-    }
-  })
-}
 
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-})
 app.whenReady().then(initializeApp)
