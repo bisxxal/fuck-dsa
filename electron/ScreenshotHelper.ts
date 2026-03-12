@@ -141,6 +141,7 @@ export class ScreenshotHelper {
 
     } catch (error) {
       console.error("Error capturing screenshot:", error);
+      throw error;
     }
   }
 
@@ -352,9 +353,9 @@ export class ScreenshotHelper {
         this.extraScreenshotQueue = this.extraScreenshotQueue.filter((filePath) => filePath !== path);
       }
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting file:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error?.message ?? String(error) };
     }
 
   }

@@ -93,9 +93,9 @@ export function initAutoUpdater() {
       await autoUpdater.downloadUpdate()
       console.log("Update download completed")
       return { success: true }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to start update:", error)
-      return { success: false, error: error.message }
+      return { success: false, error: error?.message ?? String(error) }
     }
   })
 

@@ -1,27 +1,23 @@
 'use client'
 import { WelcomeScreen } from "@/components/ui/WelcomeScreen"
-import usePlatform from "@/hooks/platform"
 import { useEffect, useState, useCallback } from "react"
 import toast from "react-hot-toast"
 
 export default function AssignmentMarketplace() {
 
-
-  const [credits, setCredits] = useState<number>(999) // Unlimited credits
+  // const [credits, setCredits] = useState<number>(999)
   const [currentLanguage, setCurrentLanguage] = useState<string>("python")
   const [isInitialized, setIsInitialized] = useState(false)
   const [hasApiKey, setHasApiKey] = useState(false)
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false)
-  // Note: Model selection is now handled via separate extraction/solution/debugging model settings
 
-  const { platform } = usePlatform()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   // Set unlimited credits
-  const updateCredits = useCallback(() => {
-    setCredits(999) // No credit limit in this version
-    window.__CREDITS__ = 999
-  }, [])
+  // const updateCredits = useCallback(() => {
+  //   setCredits(999) // No credit limit in this version
+  //   window.__CREDITS__ = 999
+  // }, [])
 
   // Helper function to safely update language
   const updateLanguage = useCallback((newLanguage: string) => {
@@ -34,23 +30,6 @@ export default function AssignmentMarketplace() {
     setIsInitialized(true)
     window.__IS_INITIALIZED__ = true
   }, [])
-
-  // Show toast method
-  // const showToast = useCallback(
-  //   (
-  //     title: string,
-  //     description: string,
-  //     variant: "neutral" | "success" | "error"
-  //   ) => {
-  //     setToastState({
-  //       open: true,
-  //       title,
-  //       description,
-  //       variant
-  //     })
-  //   },
-  //   []
-  // )
 
   // Check for OpenAI API key and prompt if not found
   useEffect(() => {
@@ -123,7 +102,7 @@ export default function AssignmentMarketplace() {
     const initializeApp = async () => {
       try {
         // Set unlimited credits
-        updateCredits()
+        // updateCredits()
         // Load config including language and model settings
         const config = await window.electronAPI.getConfig()
 
@@ -159,10 +138,8 @@ export default function AssignmentMarketplace() {
 
     // Define a no-op handler for solution success
     const unsubscribeSolutionSuccess = window.electronAPI.onSolutionSuccess(
-      () => {
-        console.log("Solution success - no credits deducted in this version")
-        // No credit deduction in this version
-      }
+      // No credit deduction in this version
+      () => { console.log("Solution success - no credits deducted in this version") }
     )
 
     // Cleanup function
@@ -172,7 +149,7 @@ export default function AssignmentMarketplace() {
       window.__IS_INITIALIZED__ = false
       setIsInitialized(false)
     }
-  }, [updateCredits, updateLanguage, markInitialized])
+  }, [updateLanguage, markInitialized])
 
   // API Key dialog management
   const handleOpenSettings = useCallback(() => {
@@ -203,14 +180,7 @@ export default function AssignmentMarketplace() {
 
 
   return (
-
-
     <div>
-
-      {
-        platform
-      }
-
       <div className="relative">
         {isInitialized ? (
           hasApiKey ? (
@@ -237,7 +207,6 @@ export default function AssignmentMarketplace() {
         )}
         {/* <UpdateNotification /> */}
       </div>
-
 
     </div>
   );

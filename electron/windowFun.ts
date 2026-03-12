@@ -27,34 +27,36 @@ export function handleWindowClosed(): void {
 
 // Window visibility functions
 export function hideMainWindow(): void {
-  if (!state.mainWindow?.isDestroyed()) {
-    const bounds = state.mainWindow.getBounds();
+  const win = state.mainWindow;
+  if (win && !win.isDestroyed()) {
+    const bounds = win.getBounds();
     state.windowPosition = { x: bounds.x, y: bounds.y };
     state.windowSize = { width: bounds.width, height: bounds.height };
-    state.mainWindow.setIgnoreMouseEvents(true, { forward: true });
-    state.mainWindow.setOpacity(0);
+    win.setIgnoreMouseEvents(true, { forward: true });
+    win.setOpacity(0);
     state.isWindowVisible = false;
     console.log('Window hidden, opacity set to 0');
   }
 }
 
 export function showMainWindow(): void {
-  if (!state.mainWindow?.isDestroyed()) {
+  const win = state.mainWindow;
+  if (win && !win.isDestroyed()) {
     if (state.windowPosition && state.windowSize) {
-      state.mainWindow.setBounds({
+      win.setBounds({
         ...state.windowPosition,
         ...state.windowSize
       });
     }
-    state.mainWindow.setIgnoreMouseEvents(false);
-    state.mainWindow.setAlwaysOnTop(true, "screen-saver", 1);
-    state.mainWindow.setVisibleOnAllWorkspaces(true, {
+    win.setIgnoreMouseEvents(false);
+    win.setAlwaysOnTop(true, "screen-saver", 1);
+    win.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true
     });
-    state.mainWindow.setContentProtection(true);
-    state.mainWindow.setOpacity(0); // Set opacity to 0 before showing
-    state.mainWindow.showInactive(); // Use showInactive instead of show+focus
-    state.mainWindow.setOpacity(1); // Then set opacity to 1 after showing
+    win.setContentProtection(true);
+    win.setOpacity(0); // Set opacity to 0 before showing
+    win.showInactive(); // Use showInactive instead of show+focus
+    win.setOpacity(1); // Then set opacity to 1 after showing
     state.isWindowVisible = true;
     console.log('Window shown with showInactive(), opacity set to 1');
   }
@@ -110,13 +112,14 @@ export function moveWindowVertical(updateFn: (y: number) => number): void {
 
 // Window dimension functions
 export function setWindowDimensions(width: number, height: number): void {
-  if (!state.mainWindow?.isDestroyed()) {
-    const [currentX, currentY] = state.mainWindow.getPosition()
+  const win = state.mainWindow;
+  if (win && !win.isDestroyed()) {
+    const [currentX, currentY] = win.getPosition()
     const primaryDisplay = screen.getPrimaryDisplay()
     const workArea = primaryDisplay.workAreaSize
     const maxWidth = Math.floor(workArea.width * 0.5)
 
-    state.mainWindow.setBounds({
+    win.setBounds({
       x: Math.min(currentX, workArea.width - maxWidth),
       y: currentY,
       width: Math.min(width + 32, maxWidth),

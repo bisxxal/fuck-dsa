@@ -5,7 +5,7 @@ import { state } from './constants';
 import * as dotenv from "dotenv"
 import { configHelper } from './configHelper';
 import { initializeIpcHandlers } from './ipcHandlers';
-import { getMainWindow, getScreenshotQueue, setWindowDimensions, moveWindowHorizontal, moveWindowVertical, getExtraScreenshotQueue, deleteScreenshot, getImagePreview, takeScreenshot, getView, toggleMainWindow, clearQueues, setView, setHasDebugged, getHasDebugged, getScreenshotHelper, getProblemInfo, setProblemInfo, initializeHelpers } from './windowFun';
+import { getMainWindow, getScreenshotQueue, setWindowDimensions, moveWindowHorizontal, moveWindowVertical, getExtraScreenshotQueue, deleteScreenshot, getImagePreview, takeScreenshot, getView, toggleMainWindow, clearQueues, setView, setHasDebugged, getHasDebugged, getScreenshotHelper, getProblemInfo, setProblemInfo, initializeHelpers, handleWindowMove, handleWindowResize, handleWindowClosed } from './windowFun';
 import { initAutoUpdater } from './autoUpdater';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -53,10 +53,11 @@ function createWindow() {
     movable: true
   }
   state.mainWindow = new BrowserWindow(windowSettings)
+
   // Add more detailed logging for window events
-  state.mainWindow.webContents.on("did-finish-load", () => {
-    console.log("Window finished loading")
-  })
+  // state.mainWindow.webContents.on("did-finish-load", () => {
+  //   console.log("Window finished loading")
+  // })
 
   if (isDev) {
     // In development, load from the dev server
@@ -119,11 +120,12 @@ function createWindow() {
     // Prevent window from being captured in screenshots
     state.mainWindow.setHiddenInMissionControl(true)
     state.mainWindow.setWindowButtonVisibility(false)
+    app.setActivationPolicy('accessory')
     state.mainWindow.setBackgroundColor("#00000000")
 
     // Prevent window from being included in window switcher
     state.mainWindow.setSkipTaskbar(true)
-
+    
     // Disable window shadow
     state.mainWindow.setHasShadow(false)
   }
@@ -133,9 +135,9 @@ function createWindow() {
   state.mainWindow.webContents.setFrameRate(60)
 
   // Set up window listeners
-  // state.mainWindow.on("move", handleWindowMove)
-  // state.mainWindow.on("resize", handleWindowResize)
-  // state.mainWindow.on("closed", handleWindowClosed)
+  state.mainWindow.on("move", handleWindowMove)
+  state.mainWindow.on("resize", handleWindowResize)
+  state.mainWindow.on("closed", handleWindowClosed)
 
   // Initialize window state
   const bounds = state.mainWindow.getBounds()
@@ -167,23 +169,20 @@ function createWindow() {
 // Environment setup
 function loadEnvVariables() {
   if (isDev) {
-    console.log("Loading env variables from:", path.join(process.cwd(), ".env"))
+    // console.log("Loading env variables from:", path.join(process.cwd()/, ".env"))
     dotenv.config({ path: path.join(process.cwd(), ".env") })
   } else {
-    console.log(
-      "Loading env variables from:",
-      path.join(process.resourcesPath, ".env")
-    )
+    console.log("Loading env variables from:",path.join(process.resourcesPath, ".env"))
     dotenv.config({ path: path.join(process.resourcesPath, ".env") })
   }
-  console.log("Environment variables loaded for open-source version")
 }
 
 async function initializeApp() {
   try {
     // Hide from Activity Monitor on macOS
     if (process.platform === 'darwin') {
-      app.setActivationPolicy('accessory')
+      app.setActivationPolicy('accessory');
+      app.dock?.hide();
     }
     const appDataPath = path.join(app.getPath('appData'), 'fuck-dsa')
     const sessionPath = path.join(appDataPath, 'session')
@@ -206,25 +205,8 @@ async function initializeApp() {
     if (!configHelper.hasApiKey()) {
       console.log("No API key found in configuration. User will need to set up.")
     }
-    initializeHelpers({
-      getScreenshotHelper,
-      getMainWindow,
-      getView,
-      setView,
-      getProblemInfo,
-      setProblemInfo,
-      getScreenshotQueue,
-      getExtraScreenshotQueue,
-      clearQueues,
-      takeScreenshot,
-      getImagePreview,
-      deleteScreenshot,
-      setHasDebugged,
-      getHasDebugged,
-      toggleMainWindow,
-      moveWindowHorizontal,
-      moveWindowVertical,
-    });
+    initializeHelpers();
+    
     initializeIpcHandlers({
       getMainWindow,
       setWindowDimensions,

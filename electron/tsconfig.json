@@ -3,14 +3,15 @@
         "target": "ES2022",
         "module": "CommonJS",
         "lib": [
-            "ES2022"
+            "ES2022",
+            "dom"
         ],
         "moduleResolution": "node",
         "outDir": "../dist-electron",
         "rootDir": ".",
         "strict": true,
         "noImplicitAny": true,
-        "esModuleInterop": true,
+        "esModuleInterop": true, 
         "skipLibCheck": true,
         "resolveJsonModule": true,
         "sourceMap": true,
@@ -27,21 +28,3 @@
         "../node_modules"
     ]
 }
-// {
-//   "compilerOptions": {
-//     "target": "ES2020",
-//     "module": "CommonJS",
-//     "allowJs": true,
-//     "skipLibCheck": true,
-//     "esModuleInterop": true,
-//     "noImplicitAny": true,
-//     "sourceMap": true,
-//     "jsx": "react-jsx",
-//     "baseUrl": ".",
-//     "outDir": "../dist-electron",
-//     "moduleResolution": "node",
-//     "resolveJsonModule": true,
-//     "allowSyntheticDefaultImports": true
-//   },
-//   "include": ["*.ts", "ConfigHelper.ts", "../src/types/electron.d.ts"]
-// }
