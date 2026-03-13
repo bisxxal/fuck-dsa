@@ -77,42 +77,42 @@ export class ShortcutsHelper {
         })
 
         globalShortcut.register("CommandOrControl+Left", () => {
-            console.log("Command/Ctrl + Left pressed. Moving window left.")
+            // console.log("Command/Ctrl + Left pressed. Moving window left.")
             this.deps.moveWindowLeft()
         })
 
         globalShortcut.register("CommandOrControl+Right", () => {
-            console.log("Command/Ctrl + Right pressed. Moving window right.")
+            // console.log("Command/Ctrl + Right pressed. Moving window right.")
             this.deps.moveWindowRight()
         })
 
         globalShortcut.register("CommandOrControl+Down", () => {
-            console.log("Command/Ctrl + down pressed. Moving window down.")
+            // console.log("Command/Ctrl + down pressed. Moving window down.")
             this.deps.moveWindowDown()
         })
 
         globalShortcut.register("CommandOrControl+Up", () => {
-            console.log("Command/Ctrl + Up pressed. Moving window Up.")
+            // console.log("Command/Ctrl + Up pressed. Moving window Up.")
             this.deps.moveWindowUp()
         })
         globalShortcut.register("CommandOrControl+B", () => {
-            console.log("Command/Ctrl + B pressed. Toggling window visibility.")
+            // console.log("Command/Ctrl + B pressed. Toggling window visibility.")
             this.deps.toggleMainWindow()
         })
 
         globalShortcut.register("CommandOrControl+Q", () => {
-            console.log("Command/Ctrl + Q pressed. Quitting application.")
+            // console.log("Command/Ctrl + Q pressed. Quitting application.")
             app.quit()
         })
 
         // Adjust opacity shortcuts
         globalShortcut.register("CommandOrControl+[", () => {
-            console.log("Command/Ctrl + [ pressed. Decreasing opacity.")
+            // console.log("Command/Ctrl + [ pressed. Decreasing opacity.")
             this.adjustOpacity(-0.1)
         })
 
         globalShortcut.register("CommandOrControl+]", () => {
-            console.log("Command/Ctrl + ] pressed. Increasing opacity.")
+            // console.log("Command/Ctrl + ] pressed. Increasing opacity.")
             this.adjustOpacity(0.1)
         })
 
@@ -127,14 +127,14 @@ export class ShortcutsHelper {
         })
 
         globalShortcut.register("CommandOrControl+0", () => {
-            console.log("Command/Ctrl + 0 pressed. Resetting zoom.")
+            // console.log("Command/Ctrl + 0 pressed. Resetting zoom.")
             const mainWindow = this.deps.getMainWindow()
             if (mainWindow) {
                 mainWindow.webContents.setZoomLevel(0)
             }
         })
         globalShortcut.register("CommandOrControl+=", () => {
-            console.log("Command/Ctrl + = pressed. Zooming in.")
+            // console.log("Command/Ctrl + = pressed. Zooming in.")
             const mainWindow = this.deps.getMainWindow()
             if (mainWindow) {
                 const currentZoom = mainWindow.webContents.getZoomLevel()

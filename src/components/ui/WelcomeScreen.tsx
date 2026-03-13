@@ -56,7 +56,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onOpenSettings }) 
           </div>
         </div>
         
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+        <div className="card p-4 mb-6">
           <h3 className="text-white/90 font-medium mb-2">Getting Started</h3>
           <p className="text-white/70 text-sm mb-3">
             Before using the application, you need to configure your OpenAI API key.

@@ -8,10 +8,16 @@ declare global {
     
     electronAPI: {
       // IPC invokers
-      getConfig: () => Promise<any>
-      updateConfig: (config: { apiKey?: string; model?: string; language?: string; opacity?: number }) => Promise<void>
+      getConfig: () => Promise<{
+        language?: string; apiKey?: string; model?: string; opacity?: number;
+        apiProvider?: string; extractionModel?: string; solutionModel?: string; debuggingModel?: string;
+      }>
+      updateConfig: (config: {
+        apiKey?: string; model?: string; language?: string; opacity?: number;
+        apiProvider?: string; extractionModel?: string; solutionModel?: string; debuggingModel?: string;
+      }) => Promise<void>
       checkApiKey: () => Promise<boolean>
-      validateApiKey: (apiKey: string) => Promise<boolean>
+      validateApiKey: (apiKey: string) => Promise<{ valid: boolean; error?: string }>
       getPlatform: () => NodeJS.Platform
       openLink: (url: string) => void
       openExternal: (url: string) => Promise<void>

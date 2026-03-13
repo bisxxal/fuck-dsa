@@ -1,8 +1,8 @@
 @import "tailwindcss";
  
 body { 
-  background: #070012;
-  color: #e6cbf6;
+  /* background: #070012; */
+  /* color: #e6cbf6; */
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -17,9 +17,7 @@ body {
   align-items: center;
 }
 
-.textbase{
-    color:  #C77DFF;
-}
+ 
  
 .buttonbg2{
   @apply bg-gradient-to-t text-white from-[#7595f9] font-medium to-[#5154f2];
@@ -53,7 +51,7 @@ body {
 
        
 .card{
-  background: #2c155326;;
+ @apply bg-white/5 border border-white/10 rounded-lg
 }
 input{
   @apply  outline-none  bg-[#2c155326];

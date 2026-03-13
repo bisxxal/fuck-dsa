@@ -1,4 +1,5 @@
 export interface ElectronAPI {
+  onShowSettings: any;
   // Original methods
   openSubscriptionPortal: (authData: {
     id: string
@@ -54,9 +55,15 @@ export interface ElectronAPI {
   getPlatform: () => string
   
   // New methods for OpenAI integration
-  getConfig: () => Promise<{ apiKey: string; model: string }>
+  getConfig: () => Promise<{
+    language?: string; apiKey?: string; model?: string; opacity?: number;
+    apiProvider?: string; extractionModel?: string; solutionModel?: string; debuggingModel?: string;
+  }>
   
-  updateConfig: (config: { apiKey?: string; model?: string }) => Promise<boolean>
+  updateConfig: (config: {
+    apiKey?: string; model?: string; language?: string; opacity?: number;
+    apiProvider?: string; extractionModel?: string; solutionModel?: string; debuggingModel?: string;
+  }) => Promise<boolean>
   checkApiKey: () => Promise<boolean>
   validateApiKey: (apiKey: string) => Promise<{ valid: boolean; error?: string }>
   openLink: (url: string) => void

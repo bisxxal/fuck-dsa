@@ -1,17 +1,16 @@
-//@ts-nocheck
+
 'use client'
 import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react" 
 import toast from "react-hot-toast"
 
 interface SubscribedAppProps {
-  credits: number
+   
   currentLanguage: string
   setLanguage: (language: string) => void
 }
 
 const SubscribedApp: React.FC<SubscribedAppProps> = ({
-  credits,
   currentLanguage,
   setLanguage
 }) => {
@@ -137,14 +136,13 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
       {/* {view === "queue" ? (
         <Queue
           setView={setView}
-          credits={credits}
+           
           currentLanguage={currentLanguage}
           setLanguage={setLanguage}
         />
       ) : view === "solutions" ? (
         <Solutions
           setView={setView}
-          credits={credits}
           currentLanguage={currentLanguage}
           setLanguage={setLanguage}
         />

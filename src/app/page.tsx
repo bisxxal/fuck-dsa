@@ -1,24 +1,17 @@
 'use client'
+import { SettingsDialog } from "@/components/SettingsDialog";
 import { WelcomeScreen } from "@/components/ui/WelcomeScreen"
+import SubscribedApp from "@/pages/SubscribedApp";
 import { useEffect, useState, useCallback } from "react"
 import toast from "react-hot-toast"
 
 export default function AssignmentMarketplace() {
-
-  // const [credits, setCredits] = useState<number>(999)
-  const [currentLanguage, setCurrentLanguage] = useState<string>("python")
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [hasApiKey, setHasApiKey] = useState(false)
-  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false)
-
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-
-  // Set unlimited credits
-  // const updateCredits = useCallback(() => {
-  //   setCredits(999) // No credit limit in this version
-  //   window.__CREDITS__ = 999
-  // }, [])
-
+  const [currentLanguage, setCurrentLanguage] = useState<string>("python");
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+ 
   // Helper function to safely update language
   const updateLanguage = useCallback((newLanguage: string) => {
     setCurrentLanguage(newLanguage)
@@ -36,7 +29,7 @@ export default function AssignmentMarketplace() {
     const checkApiKey = async () => {
       try {
         const hasKey = await window.electronAPI.checkApiKey()
-        setHasApiKey(hasKey)
+        setHasApiKey(hasKey);
 
         // If no API key is found, show the settings dialog after a short delay
         if (!hasKey) {
@@ -92,7 +85,7 @@ export default function AssignmentMarketplace() {
     });
 
     return () => {
-      unsubscribeSettings?.();
+      unsubscribeSettings();
     };
   }, []);
 
@@ -101,14 +94,13 @@ export default function AssignmentMarketplace() {
 
     const initializeApp = async () => {
       try {
-        // Set unlimited credits
-        // updateCredits()
+         
         // Load config including language and model settings
         const config = await window.electronAPI.getConfig()
 
         // Load language preference
         if (config && config.language) {
-          updateLanguage(config.language)
+          updateLanguage(config?.language)
         } else {
           updateLanguage("python")
         }
@@ -119,7 +111,6 @@ export default function AssignmentMarketplace() {
         markInitialized()
       } catch (error) {
         console.error("Failed to initialize app:", error)
-        // Fallback to defaults
         updateLanguage("python")
         markInitialized()
       }
@@ -184,14 +175,11 @@ export default function AssignmentMarketplace() {
       <div className="relative">
         {isInitialized ? (
           hasApiKey ? (
-            // <SubscribedApp
-            //   credits={credits}
-            //   currentLanguage={currentLanguage}
-            //   setLanguage={updateLanguage}
-            // />
-            <div>
-              SubscribedApp
-            </div>
+            <SubscribedApp
+              currentLanguage={currentLanguage}
+              setLanguage={updateLanguage}
+            />
+           
           ) : (
             <WelcomeScreen onOpenSettings={handleOpenSettings} />
           )
@@ -207,6 +195,11 @@ export default function AssignmentMarketplace() {
         )}
         {/* <UpdateNotification /> */}
       </div>
+
+       <SettingsDialog 
+            open={isSettingsOpen} 
+            onOpenChange={handleCloseSettings} 
+          />
 
     </div>
   );

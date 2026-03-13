@@ -2,12 +2,10 @@
 import fs from "node:fs"
 import { ScreenshotHelper } from "./ScreenshotHelper"
 import { IProcessingHelperDeps } from "./constants"
-import * as axios from "axios"
 import { BrowserWindow } from "electron"
 import { OpenAI } from "openai"
 import { configHelper } from "./configHelper"
 
- 
 // export interface IProcessingHelperDeps {
 //   getScreenshotHelper: () => ScreenshotHelper | null
 //   getMainWindow: () => BrowserWindow | null
@@ -27,7 +25,7 @@ import { configHelper } from "./configHelper"
 //   getHasDebugged: () => boolean
 //   PROCESSING_EVENTS: typeof state.PROCESSING_EVENTS
 // }
- 
+
 export class ProcessingHelper {
   private deps: IProcessingHelperDeps
   private screenshotHelper: ScreenshotHelper
@@ -138,14 +136,12 @@ export class ProcessingHelper {
     throw new Error("App failed to initialize after 5 seconds")
   }
 
-
   private async getLanguage(): Promise<string> {
     try {
       const config = configHelper.loadConfig();
       if (config.language) {
         return config.language;
       }
-
       // Fallback to window variable if config doesn't have lang
       const mainWindow = this.deps.getMainWindow()
       if (mainWindow) {
@@ -163,7 +159,6 @@ export class ProcessingHelper {
           console.warn("Could not get language from window", err);
         }
       }
-
       return "python";
     } catch (error) {
       console.error("Error getting language:", error)
@@ -186,7 +181,7 @@ export class ProcessingHelper {
         mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.API_KEY_INVALID);
         return;
       }
-    } else if (config.apiProvider === "gemini"  ) {
+    } else if (config.apiProvider === "gemini") {
       this.initializeAIClient();
 
       if (!this.geminiClient) {
@@ -276,29 +271,19 @@ export class ProcessingHelper {
 
         // Only set view to solutions if processing succeeded
         console.log("Setting view to solutions after successful processing")
-        mainWindow.webContents.send(
-          this.deps.PROCESSING_EVENTS.SOLUTION_SUCCESS,
-          result.data
-        )
+        mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.SOLUTION_SUCCESS,result.data)
         this.deps.setView("solutions")
       } catch (error: any) {
         mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, error)
         console.error("Processing error:", error)
-        // if (axios.isCancel(error)) {
-        //   mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, "Processing was canceled by the user.")
-        // } else {
-        //   mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.INITIAL_SOLUTION_ERROR, error.message || "Server error. Please try again.")
-        // }
-        // Reset view back to queue on error
-        console.log("Resetting view to queue due to error")
+
         this.deps.setView("queue")
       } finally {
         this.currentProcessingAbortController = null
       }
     } else {
       // view == 'solutions'
-      const extraScreenshotQueue =
-        this.screenshotHelper.getExtraScreenshotQueue()
+      const extraScreenshotQueue = this.screenshotHelper.getExtraScreenshotQueue()
       console.log("Processing extra queue screenshots:", extraScreenshotQueue)
 
       // Check if the extra queue is empty
@@ -377,17 +362,9 @@ export class ProcessingHelper {
           )
         }
       } catch (error: any) {
-        if (axios.isCancel(error)) {
-          mainWindow.webContents.send(
-            this.deps.PROCESSING_EVENTS.DEBUG_ERROR,
-            "Extra processing was canceled by the user."
-          )
-        } else {
-          mainWindow.webContents.send(
-            this.deps.PROCESSING_EVENTS.DEBUG_ERROR,
-            error.message
-          )
-        }
+
+        mainWindow.webContents.send(this.deps.PROCESSING_EVENTS.DEBUG_ERROR,error.message)
+
       } finally {
         this.currentExtraProcessingAbortController = null
       }
@@ -416,25 +393,25 @@ export class ProcessingHelper {
 
       let problemInfo;
 
-        const messages = [
-          {
-            role: "system" as const,
-            content: "You are a coding challenge interpreter. Analyze the screenshot of the coding problem and extract all relevant information. Return the information in JSON format with these fields: problem_statement, constraints, example_input, example_output. Just return the structured JSON without any other text."
-          },
-          {
-            role: "user" as const,
-            content: [
-              {
-                type: "text" as const,
-                text: `Extract the coding problem details from these screenshots. Return in JSON format. Preferred coding language we gonna use for this problem is ${language}.`
-              },
-              ...imageDataList.map(data => ({
-                type: "image_url" as const,
-                image_url: { url: `data:image/png;base64,${data}` }
-              }))
-            ]
-          }
-        ];
+      const messages = [
+        {
+          role: "system" as const,
+          content: "You are a coding challenge interpreter. Analyze the screenshot of the coding problem and extract all relevant information. Return the information in JSON format with these fields: problem_statement, constraints, example_input, example_output. Just return the structured JSON without any other text."
+        },
+        {
+          role: "user" as const,
+          content: [
+            {
+              type: "text" as const,
+              text: `Extract the coding problem details from these screenshots. Return in JSON format. Preferred coding language we gonna use for this problem is ${language}.`
+            },
+            ...imageDataList.map(data => ({
+              type: "image_url" as const,
+              image_url: { url: `data:image/png;base64,${data}` }
+            }))
+          ]
+        }
+      ];
 
       if (config.apiProvider === "openai") {
         // Verify OpenAI client
@@ -449,7 +426,7 @@ export class ProcessingHelper {
           }
         }
 
-       
+
         // Send to OpenAI Vision API
         const extractionResponse = await this.openaiClient.chat.completions.create({
           model: config.extractionModel || "gpt-4o",
@@ -479,7 +456,7 @@ export class ProcessingHelper {
             error: "Gemini API key not configured. Please check your settings."
           };
         }
- try{
+        try {
           const extractionResponse = await this.geminiClient.chat.completions.create({
             model: config.solutionModel || "gemini-2.5-flash",
             messages: messages,
@@ -489,7 +466,7 @@ export class ProcessingHelper {
 
 
           const responseText = extractionResponse.choices[0].message.content;
-          console.log("GEMINI RES ", responseText);
+          // console.log("GEMINI RES ", responseText);
 
           // Handle when Gemini might wrap the JSON in markdown code blocks
           const jsonText = responseText.replace(/```json|```/g, '').trim();
@@ -522,7 +499,7 @@ export class ProcessingHelper {
         }
 
         try {
-          
+
 
           const extractionResponse = await this.anthropicClient.chat.completions.create({
             model: config.extractionModel || "claude-3-7-sonnet-20250219",
@@ -602,13 +579,6 @@ export class ProcessingHelper {
 
       return { success: false, error: "Failed to process screenshots" };
     } catch (error: any) {
-      // If the request was cancelled, don't retry
-      if (axios.isCancel(error)) {
-        return {
-          success: false,
-          error: "Processing was canceled by the user."
-        };
-      }
 
       // Handle OpenAI API errors specifically
       if (error?.response?.status === 401) {
@@ -654,8 +624,7 @@ export class ProcessingHelper {
           progress: 60
         });
       }
-
-      // Create prompt for solution generation
+ 
       const promptText = `
 Generate a detailed solution for the following coding problem:
 
@@ -694,8 +663,7 @@ Your solution should be efficient, well-commented, and handle edge cases.
             error: "OpenAI API key not configured. Please check your settings."
           };
         }
-
-        // Send to OpenAI API
+ 
         const solutionResponse = await this.openaiClient.chat.completions.create({
           model: config.solutionModel || "gpt-4o",
           messages: [
@@ -707,8 +675,7 @@ Your solution should be efficient, well-commented, and handle edge cases.
         });
 
         responseContent = solutionResponse.choices[0].message.content;
-      } else if (config.apiProvider === "gemini") {
-        // Gemini processing
+      } else if (config.apiProvider === "gemini") { 
         if (!this.geminiClient) {
           return {
             success: false,
@@ -737,8 +704,7 @@ Your solution should be efficient, well-commented, and handle edge cases.
             error: "Failed to generate solution with Gemini API. Please check your API key or try again later."
           };
         }
-      } else if (config.apiProvider === "anthropic") {
-        // Anthropic processing
+      } else if (config.apiProvider === "anthropic") { 
         if (!this.anthropicClient) {
           return {
             success: false,
@@ -760,8 +726,7 @@ Your solution should be efficient, well-commented, and handle edge cases.
           responseContent = solutionResponse.choices[0].message.content;
         } catch (error: any) {
           console.error("Error using Anthropic API for solution:", error);
-
-          // Add specific handling for Claude's limitations
+ 
           if (error.status === 429) {
             return {
               success: false,
@@ -851,12 +816,7 @@ Your solution should be efficient, well-commented, and handle edge cases.
 
       return { success: true, data: formattedResponse };
     } catch (error: any) {
-      if (axios.isCancel(error)) {
-        return {
-          success: false,
-          error: "Processing was canceled by the user."
-        };
-      }
+
 
       if (error?.response?.status === 401) {
         return {

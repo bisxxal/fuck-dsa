@@ -10,9 +10,10 @@ export function initializeIpcHandlers(deps: IIpcHandlerDeps): void {
         return configHelper.loadConfig()
     })
 
-    ip.handle("set-config", async (_event, updates) => {
-        return configHelper.updateConfig(updates)
+    ip.handle("update-config", (_event, updates) => {
+        return configHelper.updateConfig(updates);
     })
+
 
     ip.handle("check-api-key", async () => {
         return configHelper.hasApiKey()
