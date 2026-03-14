@@ -45,3 +45,4 @@ next-env.d.ts
 /release/
 
 electron_architecture.md
+react_dataflow_explanation.md

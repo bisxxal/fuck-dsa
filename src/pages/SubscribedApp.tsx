@@ -1,23 +1,20 @@
 
 'use client'
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useRef, useState } from "react" 
-import toast from "react-hot-toast"
+import { useEffect, useRef, useState } from "react"
+import { toastError } from "@/provider/toast";
+import Queue from "./Queue";
 
 interface SubscribedAppProps {
-   
   currentLanguage: string
   setLanguage: (language: string) => void
 }
 
-const SubscribedApp: React.FC<SubscribedAppProps> = ({
-  currentLanguage,
-  setLanguage
-}) => {
+const SubscribedApp: React.FC<SubscribedAppProps> = ({ currentLanguage, setLanguage }) => {
   const queryClient = useQueryClient()
   const [view, setView] = useState<"queue" | "solutions" | "debug">("queue")
   const containerRef = useRef<HTMLDivElement>(null)
-   
+
   // Let's ensure we reset queries etc. if some electron signals happen
   useEffect(() => {
     const cleanup = window.electronAPI.onResetView(() => {
@@ -54,7 +51,7 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
 
     // Force initial dimension update immediately
     updateDimensions()
-    
+
     // Set a fallback timer to ensure dimensions are set even if content isn't fully loaded
     const fallbackTimer = setTimeout(() => {
       window.electronAPI?.updateContentDimensions({ width: 800, height: 600 })
@@ -125,28 +122,28 @@ const SubscribedApp: React.FC<SubscribedAppProps> = ({
         }
       }),
       window.electronAPI.onSolutionError((error: string) => {
-        toast.error(  error )
+        toastError(error)
       })
     ]
     return () => cleanupFunctions.forEach((fn) => fn())
   }, [view])
 
   return (
-    <div ref={containerRef} className="min-h-0">
-      {/* {view === "queue" ? (
+    <div ref={containerRef} className=" h-screen">
+      {view === "queue" && (
         <Queue
           setView={setView}
-           
           currentLanguage={currentLanguage}
           setLanguage={setLanguage}
         />
-      ) : view === "solutions" ? (
+      )}
+      {/* {view === "solutions" && (
         <Solutions
           setView={setView}
           currentLanguage={currentLanguage}
           setLanguage={setLanguage}
         />
-      ) : null} */}
+      ) : null}   */}
     </div>
   )
 }

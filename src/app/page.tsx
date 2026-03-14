@@ -2,8 +2,8 @@
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { WelcomeScreen } from "@/components/ui/WelcomeScreen"
 import SubscribedApp from "@/pages/SubscribedApp";
+import { toastError, toastSuccess } from "@/provider/toast";
 import { useEffect, useState, useCallback } from "react"
-import toast from "react-hot-toast"
 
 export default function AssignmentMarketplace() {
   const [currentLanguage, setCurrentLanguage] = useState<string>("python");
@@ -11,7 +11,7 @@ export default function AssignmentMarketplace() {
   const [hasApiKey, setHasApiKey] = useState(false);
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
- 
+
   // Helper function to safely update language
   const updateLanguage = useCallback((newLanguage: string) => {
     setCurrentLanguage(newLanguage)
@@ -35,9 +35,10 @@ export default function AssignmentMarketplace() {
         if (!hasKey) {
           setTimeout(() => {
             setIsSettingsOpen(true)
-          }, 1000)
+          }, 3000)
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.error("Failed to check API key:", error)
       }
     }
@@ -94,7 +95,7 @@ export default function AssignmentMarketplace() {
 
     const initializeApp = async () => {
       try {
-         
+
         // Load config including language and model settings
         const config = await window.electronAPI.getConfig()
 
@@ -120,7 +121,7 @@ export default function AssignmentMarketplace() {
 
     // Event listeners for process events
     const onApiKeyInvalid = () => {
-      toast.error("API Key Invalid")
+      toastError("API Key Invalid")
       setApiKeyDialogOpen(true)
     }
 
@@ -157,7 +158,7 @@ export default function AssignmentMarketplace() {
     try {
       await window.electronAPI.updateConfig({ apiKey })
       setHasApiKey(true)
-      toast.success("API key saved successfully")
+      toastSuccess("API key saved successfully")
 
       // Reload app after a short delay to reinitialize with the new API key
       setTimeout(() => {
@@ -165,7 +166,7 @@ export default function AssignmentMarketplace() {
       }, 1500)
     } catch (error) {
       console.error("Failed to save API key:", error)
-      toast.error("Failed to save API key")
+      toastError("Failed to save API key")
     }
   }, [])
 
@@ -179,9 +180,9 @@ export default function AssignmentMarketplace() {
               currentLanguage={currentLanguage}
               setLanguage={updateLanguage}
             />
-           
+
           ) : (
-            <WelcomeScreen onOpenSettings={handleOpenSettings} />
+            !isSettingsOpen && <WelcomeScreen onOpenSettings={handleOpenSettings} />
           )
         ) : (
           <div className="min-h-screen bg-black flex items-center justify-center">
@@ -196,10 +197,10 @@ export default function AssignmentMarketplace() {
         {/* <UpdateNotification /> */}
       </div>
 
-       <SettingsDialog 
-            open={isSettingsOpen} 
-            onOpenChange={handleCloseSettings} 
-          />
+      {isSettingsOpen && <SettingsDialog
+        open={isSettingsOpen}
+        onOpenChange={handleCloseSettings}
+      />}
 
     </div>
   );

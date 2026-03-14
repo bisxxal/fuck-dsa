@@ -11,3 +11,8 @@ export interface Solution {
   description: string
   code: string
 }
+
+export interface Screenshot {
+  path: string
+  preview: string
+}
